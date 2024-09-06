@@ -1,0 +1,79 @@
+import tkinter as tk
+from tkinter import messagebox, filedialog
+from PIL import Image
+import os
+
+# Função para adicionar tarefas
+def add_task():
+    task = entry_task.get()
+    if task:
+        listbox_tasks.insert(tk.END, task)
+        entry_task.delete(0, tk.END)
+    else:
+        messagebox.showwarning("Input Error", "Você precisa inserir uma tarefa.")
+
+# Função para remover tarefas
+def remove_task():
+    try:
+        selected_task_index = listbox_tasks.curselection()[0]
+        listbox_tasks.delete(selected_task_index)
+    except:
+        messagebox.showwarning("Selection Error", "Você precisa selecionar uma tarefa.")
+
+# Função para redimensionar imagens em lote
+def resize_images():
+    folder_path = filedialog.askdirectory()
+    if folder_path:
+        new_width = int(entry_width.get())
+        new_height = int(entry_height.get())
+        
+        for filename in os.listdir(folder_path):
+            if filename.endswith(('jpg', 'png', 'jpeg')):
+                image_path = os.path.join(folder_path, filename)
+                img = Image.open(image_path)
+                img = img.resize((new_width, new_height))
+                img.save(os.path.join(folder_path, f"resized_{filename}"))
+        messagebox.showinfo("Success", "Imagens redimensionadas com sucesso!")
+
+# Janela principal
+root = tk.Tk()
+root.title("Gestão de Tarefas e Automação de Imagens")
+
+# Interface para Gestão de Tarefas
+frame_tasks = tk.Frame(root)
+frame_tasks.pack()
+
+listbox_tasks = tk.Listbox(frame_tasks, height=10, width=50)
+listbox_tasks.pack(side=tk.LEFT)
+
+scrollbar_tasks = tk.Scrollbar(frame_tasks)
+scrollbar_tasks.pack(side=tk.RIGHT, fill=tk.Y)
+
+listbox_tasks.config(yscrollcommand=scrollbar_tasks.set)
+scrollbar_tasks.config(command=listbox_tasks.yview)
+
+entry_task = tk.Entry(root, width=50)
+entry_task.pack()
+
+button_add_task = tk.Button(root, text="Adicionar Tarefa", command=add_task)
+button_add_task.pack()
+
+button_remove_task = tk.Button(root, text="Remover Tarefa", command=remove_task)
+button_remove_task.pack()
+
+# Interface para Redimensionamento de Imagens
+label_width = tk.Label(root, text="Nova Largura:")
+label_width.pack()
+entry_width = tk.Entry(root)
+entry_width.pack()
+
+label_height = tk.Label(root, text="Nova Altura:")
+label_height.pack()
+entry_height = tk.Entry(root)
+entry_height.pack()
+
+button_resize = tk.Button(root, text="Redimensionar Imagens", command=resize_images)
+button_resize.pack()
+
+# Executar o loop principal da interface gráfica
+root.mainloop()
